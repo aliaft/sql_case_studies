@@ -153,7 +153,7 @@ with cte as (
              rank() over(partition by customer_id order by order_date)
              from menu a
              join sales b on a.product_id=b.product_id
-             where order_date >= '2021-01-07'
+             where order_date >= (select distinct join_date from members p where p.customer_id=b.customer_id)
              order by order_date
             )
 select distinct product_name, cte.customer_id 
@@ -170,7 +170,7 @@ with cte as (
              rank() over(partition by customer_id order by order_date desc)
              from menu a
              join sales b on a.product_id=b.product_id
-             where order_date < '2021-01-07'
+             where order_date < (select distinct join_date from members p where p.customer_id=b.customer_id)
              order by customer_id,order_date desc
             )
 select distinct product_name, cte.customer_id 
@@ -186,7 +186,7 @@ with cte as (
              select  customer_id,count(b.product_id) as total_item,sum(a.price) as amount_spent
              from menu a
              join sales b on a.product_id=b.product_id
-             where order_date < '2021-01-07'
+             where order_date < (select distinct join_date from members p where p.customer_id=b.customer_id)
              group by customer_id 
              order by customer_id
             )
@@ -220,7 +220,7 @@ from (
              select  order_date,customer_id,a.product_id
              from menu a
              join sales b on a.product_id=b.product_id
-             where order_date >= '2021-01-07'
+             where order_date >= (select distinct join_date from members p where p.customer_id=b.customer_id)
              order by order_date
             ),
      count_data as (
